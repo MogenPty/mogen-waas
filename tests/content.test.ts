@@ -47,6 +47,16 @@ describe("canonical content — validation", () => {
     assert.equal(safeParseCanonicalContent({ ...validContent, business: { ...validContent.business, tagline: null } }).success, true);
     assert.equal(safeParseCanonicalContent({ ...validContent, business: { ...validContent.business, tagline: "a".repeat(101) } }).success, false);
   });
+
+  it("whitespace-only business name rejected (trim before length)", () => {
+    assert.equal(safeParseCanonicalContent({ ...validContent, business: { ...validContent.business, name: "  " } }).success, false);
+    assert.equal(safeParseCanonicalContent({ ...validContent, business: { ...validContent.business, name: "   AB   " } }).success, true);
+  });
+
+  it("whitespace-only description rejected (trim before length)", () => {
+    assert.equal(safeParseCanonicalContent({ ...validContent, business: { ...validContent.business, description: "          " } }).success, false);
+    assert.equal(safeParseCanonicalContent({ ...validContent, business: { ...validContent.business, description: "   Valid description long enough   " } }).success, true);
+  });
 });
 
 describe("canonical content — repeatable stable IDs + ordering", () => {
@@ -127,6 +137,11 @@ describe("canonical content — contact/location", () => {
       phoneNumbers: [{ id: "ph-1", sortOrder: 0, label: null, number: "not-a-phone" }],
     });
     assert.equal(bad.success, false);
+  });
+
+  it("whitespace-only phone number rejected (trim before length/regex)", () => {
+    assert.equal(safeParseCanonicalContent({ ...validContent, phoneNumbers: [{ id: "ph-1", sortOrder: 0, label: null, number: "        " }] }).success, false);
+    assert.equal(safeParseCanonicalContent({ ...validContent, phoneNumbers: [{ id: "ph-1", sortOrder: 0, label: null, number: "  +27 82 123 4567  " }] }).success, true);
   });
 
   it("emailAddresses require valid email, label optional, normalized lowercase", () => {

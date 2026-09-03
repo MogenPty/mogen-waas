@@ -12,8 +12,8 @@ const assetIdSchema = z.string().min(1).nullable();
 // Required fields have meaningful min lengths; optional fields allow null.
 
 export const businessInfoSchema = z.object({
-  name: z.string().min(2, "business name 2-100").max(100).trim(),
-  description: z.string().min(10, "description 10-1000").max(1000).trim(),
+  name: z.string().trim().min(2, "business name 2-100").max(100),
+  description: z.string().trim().min(10, "description 10-1000").max(1000),
   tagline: z.string().max(100).trim().nullable(),
 });
 
@@ -74,10 +74,10 @@ export const phoneNumberSchema = z.object({
   label: z.string().max(40).trim().nullable(),
   number: z
     .string()
+    .trim()
     .min(8)
     .max(20)
-    .regex(/^\+?[0-9\s\-()]+$/, "phone number")
-    .trim(),
+    .regex(/^\+?[0-9\s\-()]+$/, "phone number"),
 });
 
 export const emailAddressSchema = z.object({
@@ -137,9 +137,8 @@ export function safeParseCanonicalContent(data: unknown) {
 }
 
 export function serializeCanonicalContent(content: CanonicalContentInput): string {
-  // Validate before serializing to catch drift
-  canonicalContentSchema.parse(content);
-  return JSON.stringify(content);
+  const parsed = canonicalContentSchema.parse(content);
+  return JSON.stringify(parsed);
 }
 
 export function deserializeCanonicalContent(json: string): CanonicalContentParsed {
