@@ -655,7 +655,7 @@ Future preview URLs may use immutable identifiers.
 
 # 23. Domain Architecture
 
-Domains are associated with websites.
+Domains are associated with websites (0..N per website).
 
 Not templates.
 
@@ -668,10 +668,76 @@ Account
   ↓
 Website
   ↓
-Domain
+Domains[]   (0..N)
 ```
 
-Provider-specific domain operations belong behind `DomainProvider`.
+And for request handling:
+
+```text
+Incoming Request
+       ↓
+Hostname
+       ↓
+Domain Lookup (normalize → Domain)
+       ↓
+Website ID
+       ↓
+Published Version (Website.activePublishedVersionId)
+       ↓
+Renderer
+       ↓
+Response
+```
+
+A website has one identity/content configuration but may have multiple hostnames. All domains belonging to the same website resolve to the **same** published version — domains do not own content and do not create versions.
+
+Distinguish three hostname types:
+
+- **Mogen subdomain** (`mogen_subdomain`) — Mogen-controlled public domain (e.g. `abcplumbing.mogen.co.za`)
+- **Customer custom domain** (`custom`) — customer-controlled domain connected to the website (e.g. `abcplumbing.co.za`)
+- **Preview/deployment hostname** — hash-like hostname for a specific deployment/version (e.g. `8tjd9g5.mogen.co.za`), stored as `Deployment.url`, not as a `Domain` row
+
+Domain types are modelled via `Domain.kind` (`mogen_subdomain` | `custom`).
+
+### Primary domain
+
+A website may have at most one primary domain (`Domain.isPrimary`). This is the preferred public/canonical hostname for canonical URLs and SEO (avoid duplicate content across aliases).
+
+Invariants:
+
+- `Domain` belongs to one `Website` (`domain.websiteId → website.id`, FK)
+- `hostname` is unique (unique index, normalized lowercase via `normalizeHostname`)
+- At most one `Domain` per `Website` may have `isPrimary = true` — enforce via partial unique index `UNIQUE (websiteId) WHERE isPrimary = true` plus application guard (`findPrimaryDomain`, `getCanonicalHostname`)
+
+### Domain status
+
+```text
+DomainStatus = pending | verified | active | disabled
+```
+
+- `pending` — associated but not yet verified/active
+- `verified` — ownership/configuration verified, not yet serving
+- `active` — actively serving the website
+- `disabled` — no longer active
+
+Provider-specific domain operations belong behind `DomainProvider` (`search`, `register({websiteId, hostname, kind})`, `configure`, `verify`). Registration/DNS/registrar integration is future scope — the interface exists to avoid coupling.
+
+### Version independence
+
+```text
+Website
+ ├── Domains[]
+ │    ├── abcplumbing.mogen.co.za (primary)
+ │    └── abcplumbing.co.za (alias)
+ └── Published Version
+      └── Version 7
+```
+
+Changing the primary domain does not create a new `WebsiteVersion`. Changing content does not create a new `Domain`. `Deployment` references a `WebsiteVersion`, not merely a `Domain`.
+
+### SEO / Canonical
+
+The primary active domain is the canonical hostname (`getCanonicalHostname`). Aliases should eventually redirect to primary or emit canonical tags — data model must not prevent this, but a full redirect system is not MVP.
 
 The architecture must eventually support:
 

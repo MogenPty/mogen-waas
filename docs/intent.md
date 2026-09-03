@@ -366,9 +366,7 @@ A deployment should be traceable to a specific website version.
 
 Preview deployments should be immutable where practical.
 
-Hash-like preview URLs are acceptable, for example:
-
-`8tjd9g5.mogen.co.za`
+Hash-like preview URLs (e.g. `8tjd9g5.mogen.co.za`) are **deployment URLs** — they identify a specific deployment/version and are not equivalent to a website's public domains. Public hostnames are modelled separately as Domain rows (see §15).
 
 Public Mogen subdomains may eventually use business-friendly identifiers such as:
 
@@ -377,6 +375,36 @@ Public Mogen subdomains may eventually use business-friendly identifiers such as
 ---
 
 ## 15. Domains
+
+A website is the owner of content/configuration; a domain is where that website is accessed. The relationship is:
+
+```text
+Account
+  ↓
+Website
+  ↓
+Domains[]   (0..N per website)
+```
+
+A website has **one identity/content configuration but may have multiple domains**, for example:
+
+```text
+Website: ABC Plumbing
+Domains:
+  ├── abcplumbing.mogen.co.za  (mogen_subdomain, primary)
+  ├── abcplumbing.co.za        (custom, alias)
+  └── abcplumbing.com          (custom, alias)
+```
+
+All resolve to the same website and the same published version — they do not duplicate content or versions, and changing the primary domain does not create a new version.
+
+Distinguish three hostname types:
+
+- **Mogen subdomain** — Mogen-controlled public domain for the website (e.g. `abcplumbing.mogen.co.za`)
+- **Customer custom domain** — customer-controlled domain connected to the website (e.g. `abcplumbing.co.za`, `abcplumbing.com`)
+- **Preview/deployment hostname** — hash-like hostname tied to a specific deployment/version (e.g. `8tjd9g5.mogen.co.za`), not a website alias
+
+A website may have at most **one primary domain** — the preferred public/canonical hostname used for canonical URLs and SEO. Aliases should be treated as aliases (eventual redirects, canonical handling) rather than duplicate content. At this stage the primary domain is a data-model invariant, not a full redirect system.
 
 The long-term intent is to make domain acquisition part of the Mogen experience.
 
@@ -388,7 +416,9 @@ The customer should eventually be able to search for and register suitable domai
 
 Existing customer domains should eventually be supported.
 
-Domain registration must be implemented behind a provider abstraction so that Mogen does not become permanently coupled to a single registrar.
+Domain registration must be implemented behind a provider abstraction (`DomainProvider`) so that Mogen does not become permanently coupled to a single registrar. DNS management, registrar integration, and marketplace features are not MVP.
+
+Domains never own content — they resolve to a website, which resolves to its published version, which is rendered. The request flow is `Hostname → Domain → Website → Published Version → Renderer`.
 
 ---
 

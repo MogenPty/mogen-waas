@@ -345,12 +345,12 @@ Drizzle ORM
 - [ ] Create content storage
 - [ ] Create version storage
 - [ ] Create asset metadata
-- [ ] Create domain records
-- [ ] Create deployment records
+- [ ] Create domain records — support `Website → Domains[]` (0..N), `isPrimary`, `kind` (`mogen_subdomain` | `custom`), `status` (`pending` | `verified` | `active` | `disabled`), unique `hostname` (normalized), partial unique index `UNIQUE (websiteId) WHERE isPrimary = true`
+- [ ] Create deployment records — `Deployment` references `WebsiteVersion` (preview hostname is `Deployment.url`, not a `Domain` row)
 - [ ] Create billing records
-- [ ] Add indexes
-- [ ] Add ownership relationships
-- [ ] Add constraints
+- [ ] Add indexes — `domain.hostname` unique, `domain.websiteId`, `domain.isPrimary` partial index
+- [ ] Add ownership relationships — `Domain.websiteId → Website.id` (FK, cascade), `Website.accountId → Account.id`
+- [ ] Add constraints — enforce at most one primary per website, hostname format, FK integrity, deletion behavior intentional
 
 Do not duplicate the domain model merely because a relational schema needs tables.
 
@@ -577,33 +577,35 @@ Implement public identifiers such as:
 businessname.mogen.co.za
 ```
 
+Data model already supports `Website → Domains[]` — this phase implements resolution for Mogen subdomains via the shared domain lookup.
+
 ### Tasks
 
-- [ ] Define slug rules
-- [ ] Prevent collisions
-- [ ] Resolve website by hostname
+- [ ] Define slug rules for `mogen_subdomain` kind
+- [ ] Prevent collisions (`hostname` unique)
+- [ ] Resolve website by hostname — `Hostname → Domain → Website → Published Version → Renderer` (via `normalizeHostname`, `findPrimaryDomain` / domain lookup service, not per-template logic)
 - [ ] Resolve active published version
-- [ ] Render published version
+- [ ] Render published version (domains do not own content)
 - [ ] Handle unavailable/unpublished websites
-- [ ] Add SEO canonical behavior
+- [ ] Add SEO canonical behavior (use `getCanonicalHostname`/primary domain)
 
 ---
 
 # 19. Phase 16 — Custom Domains
 
-Later MVP/early production stage.
+Later MVP/early production stage. Data model already supports `custom` kind — this phase adds verification and user-facing management.
 
 ### Tasks
 
-- [ ] Define domain provider interface
-- [ ] Domain verification
-- [ ] DNS configuration
+- [ ] Define domain provider interface (`DomainProvider` already in `domain/site-domain.ts` — extend as needed)
+- [ ] Domain verification (`pending` → `verified` → `active`, `disabled` for deactivation)
+- [ ] DNS configuration guidance (not registrar integration)
 - [ ] SSL considerations
-- [ ] Domain status
-- [ ] Domain-to-website mapping
-- [ ] Existing domain support
+- [ ] Domain status lifecycle
+- [ ] Domain-to-website mapping — reuse `Website → Domains[]`, at most one `isPrimary`
+- [ ] Existing domain support (connect custom domain to existing website; does not duplicate website/content)
 
-Do not implement registrar-specific logic directly into website features.
+Do not implement registrar-specific logic directly into website features. Domain purchasing/registration, DNS hosting, and marketplace features remain future scope — architecture support is already present.
 
 ---
 

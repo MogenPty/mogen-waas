@@ -321,6 +321,25 @@ Any implementation that threatens this rule requires review.
 
 ---
 
+# 18b. Domain Rule — Multiple Domains per Website
+
+A Website may have **multiple Domains** (`Website → Domains[]`, 0..N). Domain identity and website content are separate concerns — domains resolve to a website but never own content.
+
+Must enforce:
+
+- `Domain` belongs to one `Website` (`domain.websiteId` FK, not `accountId`)
+- `hostname` is normalized (`normalizeHostname`) and unique
+- At most one `Domain` per `Website` may have `isPrimary = true` (partial unique index `UNIQUE (websiteId) WHERE isPrimary = true` + application invariant `findPrimaryDomain`/`getCanonicalHostname`)
+- `Domain.kind` is `mogen_subdomain` | `custom`
+- `Domain.status` is `pending` | `verified` | `active` | `disabled`
+- Preview/deployment hostnames (e.g. `8tjd9g5.mogen.co.za`) are `Deployment.url` with `kind=preview`, not `Domain` rows
+- Hostname → Domain → Website → Published Version → Renderer is the resolution flow; changing a domain does not create a version, changing content does not create a domain
+- Aliases must not duplicate content — primary domain is canonical for SEO (see `architecture.md §23`)
+
+Agents must not collapse the relationship into `Website → one Domain` without explicit human approval. Do not introduce registrar/DNS management or domain purchasing unless separately approved.
+
+---
+
 # 19. Feature-Based Rule
 
 Prefer:
