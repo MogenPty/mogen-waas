@@ -615,17 +615,17 @@ Versions should be immutable once they become a published/deployed artifact.
 
 Deployment must reference a specific website version.
 
-Conceptually:
+Conceptually (deployment / preview):
 
 ```text
 WebsiteVersion
       ↓
 Deployment
       ↓
-Deployment URL
-      ↓
-Domain
+Deployment.url   (e.g. https://8tjd9g5.mogen.co.za — hash-like preview host)
 ```
+
+`Deployment.url` is the URL exposed by that deployment. Public website domains are **not** `Deployment.url`; they are `Domain` rows that resolve via `Hostname → Domain → Website → Published Version → Renderer` (see §23).
 
 The deployment provider should be abstracted.
 

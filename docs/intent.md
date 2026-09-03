@@ -350,7 +350,7 @@ Versioning must also leave room for future A/B testing.
 
 The public website should point to an explicitly selected published version.
 
-Conceptually:
+Conceptually (deployment / preview):
 
 ```text
 Website
@@ -359,14 +359,14 @@ Published Version
    ↓
 Deployment
    ↓
-Domain
+Deployment.url   (e.g. https://8tjd9g5.mogen.co.za — preview host, not a Domain row)
 ```
 
 A deployment should be traceable to a specific website version.
 
 Preview deployments should be immutable where practical.
 
-Hash-like preview URLs (e.g. `8tjd9g5.mogen.co.za`) are **deployment URLs** — they identify a specific deployment/version and are not equivalent to a website's public domains. Public hostnames are modelled separately as Domain rows (see §15).
+Hash-like preview URLs (e.g. `8tjd9g5.mogen.co.za`) are **deployment URLs** — they live as `Deployment.url` and are not `Domain` rows. Public hostnames are modelled separately as `Domain` rows accessed via `Domain → Website → Published Version → Renderer` (see §15).
 
 Public Mogen subdomains may eventually use business-friendly identifiers such as:
 
