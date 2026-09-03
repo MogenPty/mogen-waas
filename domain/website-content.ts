@@ -12,6 +12,7 @@ import type { ContentRecordId } from "./identifiers";
 export interface CanonicalContent {
   readonly business: BusinessInfo;
   readonly branding: Branding;
+  readonly seo: SeoInfo;
   readonly services: readonly Service[];
   readonly products: readonly Product[];
   readonly locations: readonly Location[];
@@ -21,6 +22,11 @@ export interface CanonicalContent {
   readonly socialLinks: readonly SocialLink[];
   readonly testimonials: readonly Testimonial[];
   readonly faqs: readonly Faq[];
+}
+
+export interface SeoInfo {
+  readonly metaTitle: string | null;
+  readonly metaDescription: string | null;
 }
 
 export interface BusinessInfo {
