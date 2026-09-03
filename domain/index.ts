@@ -4,6 +4,7 @@ export * from "./industry";
 export * from "./template";
 export * from "./website";
 export * from "./website-content";
+export * from "./website-content.schema";
 export * from "./website-version";
 export * from "./asset";
 export * from "./deployment";
