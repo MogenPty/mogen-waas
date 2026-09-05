@@ -2,6 +2,7 @@ export * from "./identifiers";
 export * from "./account";
 export * from "./industry";
 export * from "./template";
+export * from "./template.schema";
 export * from "./website";
 export * from "./website-content";
 export * from "./website-content.schema";
