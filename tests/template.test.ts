@@ -50,6 +50,26 @@ describe("template contract — schema", () => {
     assert.equal(r.success, false);
   });
 
+  it("rejects undeclared optionalContent in section", () => {
+    const r = templateContractSchema.safeParse({
+      requiredContent: ["business.name"],
+      optionalContent: [],
+      capabilities: [],
+      sections: [{ key: "s", title: "S", requiredContent: [], optionalContent: ["testimonials"], component: "C" }],
+    });
+    assert.equal(r.success, false);
+  });
+
+  it("rejects overlap within section required and optional", () => {
+    const r = templateContractSchema.safeParse({
+      requiredContent: ["services", "testimonials"],
+      optionalContent: [],
+      capabilities: [],
+      sections: [{ key: "s", title: "S", requiredContent: ["services"], optionalContent: ["services"], component: "C" }],
+    });
+    assert.equal(r.success, false);
+  });
+
   it("templateVersion requires supportedPages and semver", () => {
     const ok = templateVersionSchema.safeParse({
       id: "tv-1",

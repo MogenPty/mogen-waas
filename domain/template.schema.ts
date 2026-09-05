@@ -56,14 +56,24 @@ export const templateContractSchema = z
         path: ["requiredContent"],
       });
     }
-    // Section content must be subset of contract's declared content
+    // Section content must be subset of contract's declared content (both required and optional)
     for (const section of data.sections) {
       const allDeclared = [...data.requiredContent, ...data.optionalContent];
-      for (const req of section.requiredContent) {
+      const sectionOverlap = section.requiredContent.filter((r) =>
+        section.optionalContent.includes(r as never)
+      );
+      if (sectionOverlap.length > 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `section ${section.key} requiredContent and optionalContent overlap: ${sectionOverlap.join(", ")}`,
+          path: ["sections"],
+        });
+      }
+      for (const req of [...section.requiredContent, ...section.optionalContent]) {
         if (!allDeclared.includes(req)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `section ${section.key} requiredContent ${req} not declared in contract`,
+            message: `section ${section.key} content ${req} not declared in contract`,
             path: ["sections"],
           });
         }
