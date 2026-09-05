@@ -694,15 +694,16 @@ Every AI task should follow:
 2. Read docs/intent.md
 3. Read docs/architecture.md
 4. Read docs/plan.md
-5. Identify current milestone
-6. Identify affected feature
-7. Implement smallest correct change
-8. Test
-9. Type-check
-10. Lint
-11. Review dependency changes
-12. Update plan if milestone progress changed
-13. Report anything uncertain
+5. Read task.md — pick next pending task (unless human overrides); respect AFK/HITL types
+6. Identify current milestone
+7. Identify affected feature
+8. Implement smallest correct change
+9. Test
+10. Type-check
+11. Lint
+12. Review dependency changes
+13. Update task.md and plan if milestone progress changed
+14. Report anything uncertain
 ```
 
 ---

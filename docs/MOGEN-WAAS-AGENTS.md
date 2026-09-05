@@ -9,8 +9,9 @@ The authoritative product and architecture documents are:
 - `docs/intent.md`
 - `docs/architecture.md`
 - `docs/plan.md`
+- `task.md` — task board with pending/complete states and AFK/HITL types (always work on pending unless human says otherwise)
 
-Read all four documents before making substantial changes.
+Read all five documents before making substantial changes.
 
 ---
 

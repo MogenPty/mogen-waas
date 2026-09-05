@@ -18,6 +18,7 @@ This project has authoritative product and architecture documents that override 
 2. `docs/intent.md` — product intent, MVP boundaries, target customer (SA SMME)
 3. `docs/architecture.md` — technical architecture, canonical-content → template-contract → renderer pipeline, adapter pattern, gates
 4. `docs/plan.md` — phased implementation plan (current milestone tracked there)
+5. `task.md` — task board with pending/complete states and AFK/HITL types (always work on pending unless human says otherwise)
 
 If source code conflicts with `docs/intent.md`, raise the conflict — do not silently reinterpret the product.
 
